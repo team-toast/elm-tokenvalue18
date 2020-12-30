@@ -83,12 +83,23 @@ toFloatWithWarning tokens =
 
 toFloatString : Maybe Int -> TokenValue -> String
 toFloatString maxDigitsAfterDecimal tokens =
-    case maxDigitsAfterDecimal of
+    (case maxDigitsAfterDecimal of
         Nothing ->
             evmValueToUserFloatString (getEvmValue tokens)
 
         Just maxDigits ->
             evmValueToTruncatedUserFloatString maxDigits (getEvmValue tokens)
+    )
+        |> addZeroBeforeAnyStartingDecimal
+
+
+addZeroBeforeAnyStartingDecimal : String -> String
+addZeroBeforeAnyStartingDecimal numStr =
+    if String.startsWith "." numStr then
+        "0" ++ numStr
+
+    else
+        numStr
 
 
 toConciseString : TokenValue -> String
@@ -141,6 +152,12 @@ div t i =
         (getEvmValue t)
         (BigInt.fromInt i)
         |> TokenValue
+
+
+getRatioWithWarning : TokenValue -> TokenValue -> Float
+getRatioWithWarning t1 t2 =
+    toFloatWithWarning t1
+        / toFloatWithWarning t2
 
 
 divFloatWithWarning : TokenValue -> Float -> TokenValue
