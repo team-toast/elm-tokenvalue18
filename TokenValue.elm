@@ -131,23 +131,23 @@ sub t1 t2 =
         |> TokenValue
 
 
-mul : TokenValue -> Int -> TokenValue
-mul t i =
+mulByInt : Int -> TokenValue -> TokenValue
+mulByInt i t =
     BigInt.mul
         (getEvmValue t)
         (BigInt.fromInt i)
         |> TokenValue
 
 
-mulFloatWithWarning : TokenValue -> Float -> TokenValue
-mulFloatWithWarning t f =
+mulByFloatWithWarning : Float -> TokenValue -> TokenValue
+mulByFloatWithWarning f t =
     toFloatWithWarning t
         * f
         |> fromFloatWithWarning
 
 
-div : TokenValue -> Int -> TokenValue
-div t i =
+divByInt : Int -> TokenValue -> TokenValue
+divByInt i t =
     BigInt.div
         (getEvmValue t)
         (BigInt.fromInt i)
@@ -160,8 +160,8 @@ getRatioWithWarning t1 t2 =
         / toFloatWithWarning t2
 
 
-divFloatWithWarning : TokenValue -> Float -> TokenValue
-divFloatWithWarning t f =
+divByFloatWithWarning : Float -> TokenValue -> TokenValue
+divByFloatWithWarning f t =
     toFloatWithWarning t
         / f
         |> fromFloatWithWarning
