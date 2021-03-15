@@ -313,3 +313,32 @@ maxTokenValue =
 isMaxTokenValue : TokenValue -> Bool
 isMaxTokenValue tv =
     compare tv maxTokenValue == EQ
+
+
+toString : TokenValue -> String
+toString tokenValue =
+    let
+        evm =
+            tokenValue
+                |> TokenValue.getEvmValue
+                |> BigInt.toString
+
+        evmLength =
+            evm
+                |> String.length
+    in
+    if evmLength <= tokenDecimals then
+        evm
+            |> String.padLeft tokenDecimals '0'
+            |> (++) "0."
+
+    else
+        evm
+            |> String.right tokenDecimals
+            |> (++)
+                "."
+            |> (++)
+                (evm
+                    |> String.left
+                        (evmLength - tokenDecimals)
+                )
