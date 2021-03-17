@@ -316,10 +316,10 @@ isMaxTokenValue tv =
 
 
 toString : TokenValue -> String
-toString tokenValue =
+toString value =
     let
         evm =
-            tokenValue
+            value
                 |> TokenValue.getEvmValue
                 |> BigInt.toString
 
