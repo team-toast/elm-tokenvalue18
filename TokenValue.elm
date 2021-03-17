@@ -320,7 +320,7 @@ toString value =
     let
         evm =
             value
-                |> TokenValue.getEvmValue
+                |> getEvmValue
                 |> BigInt.toString
 
         evmLength =
