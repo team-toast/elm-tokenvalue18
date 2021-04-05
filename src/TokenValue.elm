@@ -1,15 +1,14 @@
-module TokenValue exposing (..)
+module TokenValue exposing (TokenValue, add, compare, decoder, divByFloatWithWarning, divByInt, encode, fromIntTokenValue, fromString, getEvmValue, getRatioWithWarning, isMaxTokenValue, isZero, mulByFloatWithWarning, mulByInt, sub, toConciseString, toFloatWithWarning, tokenValue, zero)
 
 import BigInt exposing (BigInt)
-import FormatFloat exposing (..)
-import Helpers.BigInt as BigIntHelpers
-import Helpers.Eth as EthHelpers
+import FormatNumber
+import FormatNumber.Locales exposing (usLocale)
 import Json.Decode
 import Json.Encode
-import MaybeDebugLog exposing (maybeDebugLog)
 import Round
 
 
+tokenDecimals : Int
 tokenDecimals =
     18
 
@@ -38,10 +37,6 @@ fromFloatWithWarning val =
             tokenValue bigint
 
         Nothing ->
-            let
-                _ =
-                    maybeDebugLog "Error converting float to tokenValue" val
-            in
             tokenValue (BigInt.fromInt 0)
 
 
@@ -74,10 +69,6 @@ toFloatWithWarning tokens =
             f
 
         Nothing ->
-            let
-                _ =
-                    maybeDebugLog "Error converting tokenValue to float: string -> float failed" tokens
-            in
             0
 
 
@@ -178,14 +169,25 @@ encode : TokenValue -> Json.Encode.Value
 encode tv =
     tv
         |> getEvmValue
-        |> BigIntHelpers.encode
+        |> BigInt.toString
+        |> Json.Encode.string
 
 
 decoder : Json.Decode.Decoder TokenValue
 decoder =
     Json.Decode.map
         tokenValue
-        BigIntHelpers.decoder
+        (Json.Decode.string
+            |> Json.Decode.andThen
+                (\string ->
+                    case BigInt.fromIntString string of
+                        Just val ->
+                            Json.Decode.succeed val
+
+                        Nothing ->
+                            Json.Decode.fail "Can't convert that to a BigInt"
+                )
+        )
 
 
 
@@ -307,7 +309,7 @@ removeUnnecessaryZerosAndDots numString =
 
 maxTokenValue : TokenValue
 maxTokenValue =
-    tokenValue EthHelpers.maxUintValue
+    tokenValue maxUintValue
 
 
 isMaxTokenValue : TokenValue -> Bool
@@ -320,7 +322,7 @@ toString value =
     let
         evm =
             value
-                |> TokenValue.getEvmValue
+                |> getEvmValue
                 |> BigInt.toString
 
         evmLength =
@@ -342,3 +344,31 @@ toString value =
                     |> String.left
                         (evmLength - tokenDecimals)
                 )
+
+
+autoFormatFloat : Float -> String
+autoFormatFloat f =
+    let
+        magnitude =
+            floor <| logBase 10 f + 1
+
+        numDecimals =
+            max
+                (3 - magnitude)
+                0
+    in
+    f
+        |> FormatNumber.format
+            { usLocale
+                | decimals = FormatNumber.Locales.Exact numDecimals
+            }
+
+
+maxUintValue : BigInt.BigInt
+maxUintValue =
+    BigInt.sub
+        (BigInt.pow
+            (BigInt.fromInt 2)
+            (BigInt.fromInt 256)
+        )
+        (BigInt.fromInt 1)
