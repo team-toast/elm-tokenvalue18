@@ -1,4 +1,4 @@
-module TokenValue exposing (TokenValue, add, compare, decoder, divByFloatWithWarning, divByInt, encode, fromFloatWithWarning, fromIntTokenValue, fromString, getEvmValue, getRatioWithWarning, isMaxTokenValue, isZero, mulByFloatWithWarning, mulByInt, sub, toConciseString, toFloatWithWarning, tokenValue, zero)
+module TokenValue exposing (TokenValue, add, compare, decoder, divByFloatWithWarning, divByInt, encode, fromFloatWithWarning, fromIntTokenValue, fromString, getEvmValue, getRatioWithWarning, isMaxTokenValue, isZero, mulByFloatWithWarning, mulByInt, sub, toConciseString, toFixedPrecisionFloatString, toFloatWithWarning, tokenValue, zero)
 
 import BigInt exposing (BigInt)
 import FormatNumber
