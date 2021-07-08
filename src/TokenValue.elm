@@ -84,6 +84,31 @@ toFloatString maxDigitsAfterDecimal tokens =
         |> addZeroBeforeAnyStartingDecimal
 
 
+toFixedPrecisionFloatString : Int -> TokenValue -> String
+toFixedPrecisionFloatString requiredDecimals tokens =
+    let
+        possiblyTooShortString =
+            toFloatString (Just requiredDecimals) tokens
+
+        maybePointIndex =
+            String.indexes "." possiblyTooShortString
+                |> List.head
+    in
+    case maybePointIndex of
+        Just pointIndex ->
+            let
+                existingDecimals =
+                    String.length possiblyTooShortString - (pointIndex + 1)
+
+                extraNeededDecimals =
+                    requiredDecimals - existingDecimals
+            in
+            possiblyTooShortString ++ String.repeat extraNeededDecimals "0"
+
+        Nothing ->
+            possiblyTooShortString ++ "." ++ String.repeat requiredDecimals "0"
+
+
 addZeroBeforeAnyStartingDecimal : String -> String
 addZeroBeforeAnyStartingDecimal numStr =
     if String.startsWith "." numStr then
